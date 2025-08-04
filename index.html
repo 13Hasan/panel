@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ProKick Jerseys - Admin Panel ve Müşteri</title>
+<style>
+  body {
+    margin: 0; font-family: Arial, sans-serif;
+    background: #4caf50; /* çəmən yaşıl */
+    color: #fff;
+  }
+  header {
+    background: #388e3c;
+    padding: 15px 20px;
+    text-align: center;
+    font-size: 1.8rem;
+    font-weight: bold;
+  }
+  /* Müştəri formu */
+  #customerSection {
+    max-width: 480px;
+    margin: 20px auto;
+    background: #66bb6a;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+  }
+  #customerSection h2 {
+    margin-bottom: 15px;
+    color: #fff;
+  }
+  label {
+    display: block;
+    margin-top: 12px;
+    font-weight: bold;
+    color: #f0f0f0;
+  }
+  select, input[type=text], input[type=number] {
+    width: 100%;
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: none;
+    font-size: 1rem;
+    margin-top: 4px;
+  }
+  button {
+    margin-top: 20px;
+    width: 100%;
+    padding: 12px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  button#orderSubmit {
+    background-color: #2e7d32; /* qəbul yaşıl */
+    color: white;
+  }
+  button#orderSubmit:hover {
+    background-color: #1b5e20;
+  }
+  /* Admin panel */
+  #adminPanel {
+    display: none;
+    max-width: 900px;
+    margin: 20px auto;
+    background: #2e7d32;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    color: #fff;
+  }
+  #adminPanel h2 {
+    text-align: center;
+    margin-bottom: 15px;
+  }
+  #loginForm {
+    max-width: 320px;
+    margin: 80px auto;
+    background: #388e3c;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 0 12px rgba(0,0,0,0.3);
+  }
+  #loginForm input[type=password] {
+    width: 100%;
+    padding: 10px 12px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    border: none;
+    font-size: 1.1rem;
+  }
+  #loginForm button {
+    background: #1b5e20;
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  th, td {
+    padding: 12px 10px;
+    border-bottom: 1px solid #4caf50;
+    text-align: left;
+  }
+  th {
+    background-color: #388e3c;
+  }
+  .btnAccept {
+    background-color: #2e7d32;
+    color: #c8e6c9;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 700;
+  }
+  .btnAccept:hover {
+    background-color: #1b5e20;
+  }
+  .btnReject {
+    background-color: #c62828;
+    color: #fff;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 700;
+  }
+  .btnReject:hover {
+    background-color: #8e0000;
+  }
+  /* Bildiriş paneli */
+  #notification {
+    position: fixed;
+    top: 10px; right: 10px;
+    background: #388e3c;
+    padding: 12px 18px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.4);
+    display: none;
+    font-weight: bold;
+    z-index: 9999;
+  }
+</style>
+</head>
+<body>
+
+<header>ProKick Jerseys - Sipariş ve Yönetim</header>
+
+<div id="loginForm">
+  <h2>Admin Girişi</h2>
+  <input type="password" id="adminPassword" placeholder="Şifreyi girin" />
+  <button onclick="adminLogin()">Giriş Yap</button>
+</div>
+
+<div id="adminPanel">
+  <h2>Admin Panel - Siparişler</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Oyuncu</th>
+        <th>Beden</th>
+        <th>Adet</th>
+        <th>Adı</th>
+        <th>Ülke</th>
+        <th>Posta Kodu</th>
+        <th>Durum</th>
+        <th>İşlem</th>
+      </tr>
+    </thead>
+    <tbody id="ordersTableBody"></tbody>
+  </table>
+  <button onclick="adminLogout()" style="margin-top: 20px; background: #c62828; color:#fff; padding: 10px 15px; border:none; border-radius: 8px; font-weight:700; cursor:pointer;">Çıkış Yap</button>
+</div>
+
+<div id="customerSection">
+  <h2>Formayı Sipariş Et</h2>
+  <label for="player">Oyuncu</label>
+  <select id="player" required>
+    <option value="">Oyuncu Seçin</option>
+    <option value="Cristiano Ronaldo">Cristiano Ronaldo</option>
+    <option value="Lionel Messi">Lionel Messi</option>
+    <option value="Neymar Jr">Neymar Jr</option>
+    <!-- Daha fazla oyuncu eklenebilir -->
+  </select>
+
+  <label for="size">Beden</label>
+  <select id="size" required>
+    <option value="">Beden Seçin</option>
+    <option value="S">S</option>
+    <option value="M">M</option>
+    <option value="L">L</option>
+    <option value="XL">XL</option>
+  </select>
+
+  <label for="quantity">Adet</label>
+  <input type="number" id="quantity" min="1" value="1" required />
+
+  <label for="name">Adı (siparişi kimin için?)</label>
+  <input type="text" id="name" placeholder="Tam Adınız" required />
+
+  <label for="country">Ülke</label>
+  <select id="country" required>
+    <option value="">Ülke Seçin</option>
+    <option value="Türkiye">Türkiye</option>
+    <option value="Almanya">Almanya</option>
+    <option value="Azerbaycan">Azerbaycan</option>
+    <option value="Fransa">Fransa</option>
+    <option value="İtalya">İtalya</option>
+    <!-- Daha fazla ülke eklenebilir -->
+  </select>
+
+  <label for="postalCode">Posta Kodu</label>
+  <input type="text" id="postalCode" placeholder="Posta Kodunuz" required />
+
+  <button id="orderSubmit">Sipariş Ver</button>
+</div>
+
+<div id="notification"></div>
+
+<!-- Duyma -->
+<audio id="acceptSound" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg" preload="auto"></audio>
+<audio id="rejectSound" src="https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg" preload="auto"></audio>
+
+<script>
+  // Sifarişlər arrayi
+  let orders = [];
+
+  // Elementlər
+  const loginForm = document.getElementById('loginForm');
+  const adminPanel = document.getElementById('adminPanel');
+  const ordersTableBody = document.getElementById('ordersTableBody');
+  const notification = document.getElementById('notification');
+
+  // Duyma səs elementləri
+  const acceptSound = document.getElementById('acceptSound');
+  const rejectSound = document.getElementById('rejectSound');
+
+  // Admin giriş funksiyası
+  function adminLogin() {
+    const pass = document.getElementById('adminPassword').value;
+    if(pass === 'qehbesen') {
+      loginForm.style.display = 'none';
+      adminPanel.style.display = 'block';
+      showNotification('Admin paneline giriş yapıldı');
+      renderOrders();
+    } else {
+      alert('Şifre yanlış!');
+    }
+  }
+  // Admin çıxış
+  function adminLogout() {
+    loginForm.style.display = 'block';
+    adminPanel.style.display = 'none';
+    showNotification('Admin çıkış yaptı');
+  }
+
+  // Sifariş vermə
+  document.getElementById('orderSubmit').addEventListener('click', () => {
+    const player = document.getElementById('player').value;
+    const size = document.getElementById('size').value;
+    const quantity = parseInt(document.getElementById('quantity').value);
+    const name = document.getElementById('name').value.trim();
+    const country = document.getElementById('country').value;
+    const postalCode = document.getElementById('postalCode').value.trim();
+
+    if(!player || !size || !quantity || !name || !country || !postalCode) {
+      alert('Lütfen tüm alanları doldurun!');
+      return;
+    }
+
+    const order = {
+      player, size, quantity, name, country, postalCode, status: 'Beklemede'
+    };
+
+    orders.push(order);
+    showNotification('Yeni sipariş alındı: ' + name);
+    clearForm();
+    renderOrders();
+  });
+
+  // Sifarişləri göstərin
+  function renderOrders() {
+    ordersTableBody.innerHTML = '';
+    if(orders.length === 0) {
+      ordersTableBody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:#a5d6a7;">Sipariş yok</td></tr>';
+      return;
+    }
+    orders.forEach((order, i) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${order.player}</td>
+        <td>${order.size}</td>
+        <td>${order.quantity}</td>
+        <td>${order.name}</td>
+        <td>${order.country}</td>
+        <td>${order.postalCode}</td>
+        <td>${order.status}</td>
+        <td>
+          <button class="btnAccept" onclick="acceptOrder(${i})">Qəbul Et</button>
+          <button class="btnReject" onclick="rejectOrder(${i})">Ləğv Et</button>
+        </td>
+      `;
+      ordersTableBody.appendChild(tr);
+    });
+  }
+
+  // Sifarişi qəbul et
+  function acceptOrder(i) {
+    orders[i].status = 'Qəbul edildi';
+    acceptSound.play();
+    renderOrders();
+    showNotification(`Sipariş ${orders[i].name} tarafından qəbul edildi`);
+  }
+
+  // Sifarişi ləğv et
+  function rejectOrder(i) {
+    orders[i].status = 'Ləğv edildi';
+    rejectSound.play();
+    renderOrders();
+    showNotification(`Sipariş ${orders[i].name} tarafından ləğv edildi`);
+  }
+
+  // Bildiriş göstər
+  function showNotification(msg) {
+    notification.textContent = msg;
+    notification.style.display = 'block';
+    setTimeout(() => {
+      notification.style.display = 'none';
+    }, 3000);
+  }
+
+  // Formu təmizlə
+  function clearForm() {
+    document.getElementById('player').value = '';
+    document.getElementById('size').value = '';
+    document.getElementById('quantity').value = 1;
+    document.getElementById('name').value = '';
+    document.getElementById('country').value = '';
+    document.getElementById('postalCode').value = '';
+  }
+</script>
+
+</body>
+</html>
